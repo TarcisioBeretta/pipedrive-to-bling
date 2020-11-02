@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { BlingModule } from './bling/bling.module';
 import { DealModule } from './deal/deal.module';
 import { IntegrationModule } from './integration/integration.module';
@@ -24,8 +22,6 @@ function getMongoConfig() {
     PipedriveModule,
     DealModule,
     IntegrationModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  ]
 })
 export class AppModule { }
