@@ -59,7 +59,7 @@ describe('PipedriveService', () => {
   });
 
   it('should be defined', () => {
-    expect(PipedriveService).toBeDefined();
+    expect(pipedriveService).toBeDefined();
   });
 
   describe('getPipedriveDeals', () => {

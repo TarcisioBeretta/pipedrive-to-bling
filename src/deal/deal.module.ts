@@ -8,5 +8,6 @@ import { Deal, DealSchema } from './schema/deal.schema';
   imports: [MongooseModule.forFeature([{ name: Deal.name, schema: DealSchema }])],
   providers: [DealService],
   controllers: [DealController],
+  exports: [DealService],
 })
 export class DealModule { }

@@ -8,19 +8,22 @@ import { DealModule } from './deal/deal.module';
 import { IntegrationModule } from './integration/integration.module';
 import { PipedriveModule } from './pipedrive/pipedrive.module';
 
-const configOptions = {
-  isGlobal: true,
-  envFilePath: './src/configs/.env'
+function configOptions() {
+  return { isGlobal: true, envFilePath: './src/configs/.env' };
+}
+
+function getMongoConfig() {
+  return process.env.MONGO_CONNECTION_STRING;
 }
 
 @Module({
   imports: [
+    ConfigModule.forRoot(configOptions()),
+    MongooseModule.forRoot(getMongoConfig()),
     BlingModule,
     PipedriveModule,
     DealModule,
     IntegrationModule,
-    ConfigModule.forRoot(configOptions),
-    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRING)
   ],
   controllers: [AppController],
   providers: [AppService],

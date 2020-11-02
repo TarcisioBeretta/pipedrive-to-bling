@@ -120,7 +120,7 @@ describe('BlingService', () => {
   });
 
   it('should be defined', () => {
-    expect(BlingService).toBeDefined();
+    expect(blingService).toBeDefined();
   });
 
   describe('createBlingOrder', () => {
