@@ -1,4 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { PipedriveDealReturn } from './interface/pipedrive-deal-return.interface';
+import { PipedriveGetDealsReturn } from './interface/pipedrive-get-deals-return.interface';
 
 @Injectable()
-export class PipedriveService {}
+export class PipedriveService {
+
+  constructor(private httpService: HttpService) { }
+
+  async getPipedriveDeals(): Promise<PipedriveDealReturn[]> {
+    const params = { params: { status: 'won' } };
+    const response = this.httpService.get('deals', params);
+    const responseData = await this.getResponseData(response);
+    this.validateResponseData(responseData)
+    return responseData.data;
+  }
+
+  private async getResponseData(responseObservable: Observable<any>): Promise<PipedriveGetDealsReturn> {
+    const responsePromise = await responseObservable.toPromise();
+    const responseData = responsePromise.data;
+    return responseData;
+  }
+
+  private validateResponseData(responseData: PipedriveGetDealsReturn): void {
+    if (!responseData.success) {
+      throw new Error(`${responseData.errorCode} - ${responseData.error}`);
+    }
+  }
+}
