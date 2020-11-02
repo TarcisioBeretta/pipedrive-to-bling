@@ -1,7 +1,48 @@
 import { HttpModule, HttpService } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
+import { PipedriveDealReturn } from './interface/pipedrive-deal-return.interface';
 import { PipedriveService } from './pipedrive.service';
+
+const endpoint = 'deals';
+
+const params = { params: { status: 'won' } };
+
+const deals = [{}, {}, {}]
+
+const dataSuccess = {
+  success: true,
+  error: null,
+  errorCode: null,
+  data: deals,
+  additional_data: {},
+}
+
+const dataError = {
+  success: false,
+  error: 'Mocked error',
+  errorCode: 11554,
+  data: [],
+  additional_data: {},
+}
+
+const httpGetReturnSuccess = of({
+  status: 200,
+  statusText: 'success',
+  headers: [],
+  config: {},
+  data: dataSuccess
+});
+
+const httpGetReturnError = of({
+  status: 200,
+  statusText: 'error',
+  headers: [],
+  config: {},
+  data: dataError
+});
+
+const errorMessage = `${dataError.errorCode} - ${dataError.error}`
 
 describe('PipedriveService', () => {
   let httpService: HttpService;
@@ -17,32 +58,16 @@ describe('PipedriveService', () => {
     pipedriveService = moduleRef.get<PipedriveService>(PipedriveService);
   });
 
+  it('should be defined', () => {
+    expect(PipedriveService).toBeDefined();
+  });
+
   describe('getPipedriveDeals', () => {
     it('should return an array of deal', async () => {
-      const endpoint = 'deals';
-      const params = { params: { status: 'won' } };
-
-      const deals = [{}, {}, {}]
-
-      const data = {
-        success: true,
-        error: null,
-        errorCode: null,
-        data: deals,
-        additional_data: {},
-      }
-
-      const httpGetReturn = of({
-        status: 200,
-        statusText: 'success',
-        headers: [],
-        config: {},
-        data
-      });
-
-      jest.spyOn(httpService, 'get').mockImplementation(() => httpGetReturn);
+      jest.spyOn(httpService, 'get').mockImplementation(() => httpGetReturnSuccess);
 
       const returnedValue = await pipedriveService.getPipedriveDeals();
+
       expect(returnedValue).toBe(deals);
       expect(returnedValue.length).toBe(deals.length);
       expect(httpService.get).toBeCalledWith(endpoint, params);
@@ -50,34 +75,21 @@ describe('PipedriveService', () => {
   });
 
   describe('getPipedriveDeals', () => {
-    it('should throw an error', async () => {
-      const endpoint = 'deals';
-      const params = { params: { status: 'won' } };
+    it('should throw an error on getPipedriveDeals', async () => {
+      let error: Error;
+      let returnedValue: PipedriveDealReturn[];
 
-      const data = {
-        success: false,
-        error: 'Mocked error',
-        errorCode: 11554,
-        data: [],
-        additional_data: {},
-      }
-
-      const httpGetReturn = of({
-        status: 200,
-        statusText: 'error',
-        headers: [],
-        config: {},
-        data
-      });
-
-      jest.spyOn(httpService, 'get').mockImplementation(() => httpGetReturn);
+      jest.spyOn(httpService, 'get').mockImplementation(() => httpGetReturnError);
 
       try {
-        await pipedriveService.getPipedriveDeals();
+        returnedValue = await pipedriveService.getPipedriveDeals();
       } catch (e) {
-        expect(e.message).toBe(`${data.errorCode} - ${data.error}`);
-        expect(httpService.get).toBeCalledWith(endpoint, params);
+        error = e;
       }
+
+      expect(returnedValue).toEqual(undefined);
+      expect(error.message).toBe(errorMessage);
+      expect(httpService.get).toBeCalledWith(endpoint, params);
     });
   });
 });

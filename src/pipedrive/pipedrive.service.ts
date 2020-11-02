@@ -6,11 +6,14 @@ import { PipedriveGetDealsReturn } from './interface/pipedrive-get-deals-return.
 @Injectable()
 export class PipedriveService {
 
+  private readonly ENDPOINT = 'deals';
+  private readonly STATUS_WON = 'won';
+
   constructor(private httpService: HttpService) { }
 
   async getPipedriveDeals(): Promise<PipedriveDealReturn[]> {
-    const params = { params: { status: 'won' } };
-    const response = this.httpService.get('deals', params);
+    const params = { params: { status: this.STATUS_WON } };
+    const response = this.httpService.get(this.ENDPOINT, params);
     const responseData = await this.getResponseData(response);
     this.validateResponseData(responseData)
     return responseData.data;
